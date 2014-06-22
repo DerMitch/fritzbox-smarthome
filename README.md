@@ -9,7 +9,7 @@ Getestet mit:
 
 * FRITZ!Box 7390 (Firmware 06.03)
 * FRITZ!DECT 200
-* FRITZ!Powerlne 546E
+* FRITZ!Powerline 546E
 
 Installation
 ------------
