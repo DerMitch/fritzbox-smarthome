@@ -8,6 +8,7 @@ from __future__ import print_function, division
 
 import re
 import time
+import json
 import socket
 
 import click
@@ -141,6 +142,27 @@ def switch_off(context, ain):
     else:
         click.echo("Actor not found: {}".format(ain))
 
+
+@cli.command()
+@click.option('--format', type=click.Choice(['plain', 'json']),
+              default='plain')
+@click.pass_context
+def logs(context, format):
+    """Show system logs since last reboot"""
+    fritz = context.obj
+    fritz.login()
+
+    messages = fritz.get_logs()
+    if format == "plain":
+        for msg in messages:
+            merged = "{} {} {}".format(msg.date, msg.time, msg.message.encode("UTF-8"))
+            click.echo(merged)
+
+    if format == "json":
+        entries = [msg._asdict() for msg in messages]
+        click.echo(json.dumps({
+            "entries": entries,
+        }))
 
 if __name__ == '__main__':
     cli()
