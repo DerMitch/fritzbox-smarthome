@@ -1,8 +1,6 @@
 fritzbox-smarthome
 ==================
 
-**Work in progress. Die Library funktioniert, aber Pakete, Doku etc. fehlen noch.**
-
 Python-Bibliothek um FRITZ!Box SmartHome-Geräte (DECT 200, PowerLine 546E, ...) zu steuern und die Energiewerte auszulesen.
 
 Getestet mit:
@@ -15,9 +13,10 @@ Installation
 ------------
 
 ```
+virtualenv ~/fritzenv
+source ~/fritzenv/bin/activate
 pip install fritzhome
 ```
-
 
 SmartHome-Benutzer
 ------------------
@@ -25,7 +24,8 @@ SmartHome-Benutzer
 Aus Sicherheisgründen ist es empfehlenswert, einen eigenen Benutzer zum SmartHome-Zugriff zu verwenden. Dazu in der FRITZ!Box:
 
 1. Die Benutzer-basierte Anmeldung aktivieren (unter "System" -> "FRITZ!Box Benutzer")
-2. Und einen neuen Benutzer Benutzer "smarthome" erstellen. Dieser braucht nur Rechte auf "Smart Home".
+2. Und einen neuen Benutzer Benutzer "smarthome" erstellen. Dieser braucht nur Rechte auf den Bereich "Smart Home".
+
 
 Verwendung
 ----------

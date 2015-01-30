@@ -25,6 +25,7 @@ from .parser import HomeAutoOverviewParser
 Device = namedtuple("Device", "deviceid connectstate switchstate")
 LogEntry = namedtuple("LogEntry", "date time message hash")
 
+
 class FritzBox(object):
     """
     Provides easy access to a FritzBOX's SmartHome functions,

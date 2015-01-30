@@ -164,5 +164,6 @@ def logs(context, format):
             "entries": entries,
         }))
 
+
 if __name__ == '__main__':
     cli()
