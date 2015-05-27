@@ -26,6 +26,11 @@ class HomeAutoOverviewParser(HTMLParser):
         # Result
         self.actors = []
 
+        # Since one of the last updates, the columns were changed:
+        # There is now a temperature column (c3), but the AIN is gone
+        # FIXME
+        raise Exception("Sorry, the actors parser is currently broken")
+
     def handle_starttag(self, tag, attrs):
         # <tr id="uiView_SHDevice_16" >
         attrs = dict(attrs)
