@@ -5,7 +5,7 @@ Python-Bibliothek um FRITZ!Box SmartHome-Geräte (DECT 200, PowerLine 546E, ...)
 
 Getestet mit:
 
-* FRITZ!Box 7390 (Firmware 06.03)
+* FRITZ!Box 7390 (Firmware 06.23)
 * FRITZ!DECT 200
 * FRITZ!Powerline 546E
 
