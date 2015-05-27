@@ -19,7 +19,6 @@ from requests import Session
 from bs4 import BeautifulSoup
 
 from .actor import Actor
-from .parser import HomeAutoOverviewParser
 
 
 Device = namedtuple("Device", "deviceid connectstate switchstate")
@@ -92,24 +91,20 @@ class FritzBox(object):
         Returns a list of Actor objects for querying SmartHome devices.
         Recommended method as long AVM does not change their interface HTML.
         """
-        url = self.base_url + "/net/home_auto_overview.lua"
-        response = self.session.get(url, params={
-            'sid': self.sid,
-        })
-        response.raise_for_status()
-
-        # Now comes the ugly part. Because AVM does not provide an API
-        # for that, we have to extract it from the webinterface
-        parser = HomeAutoOverviewParser()
-        parser.feed(response.text)
+        devices = self.homeautoswitch("getdevicelistinfos")
+        xml = ET.fromstring(devices)
 
         actors = []
-        for info in parser.actors:
+        for device in xml.findall('device'):
+            name = device.find('name').text
             actors.append(Actor(
                 fritzbox=self,
-                actor_id=info.actor_id,
-                device_id=info.device_id,
-                name=info.name,
+                actor_id=device.attrib['identifier'],
+                device_id=device.attrib['id'],
+                fwversion=device.attrib['fwversion'],
+                productname=device.attrib['productname'],
+                manufacturer=device.attrib['manufacturer'],
+                name=name,
             ))
 
         return actors

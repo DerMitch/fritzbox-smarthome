@@ -11,11 +11,15 @@ class Actor(object):
     instead.
     """
 
-    def __init__(self, fritzbox, actor_id, device_id, name):
+    def __init__(self, fritzbox, actor_id, device_id, name, fwversion,
+                       productname, manufacturer):
         self.box = fritzbox
         self.actor_id = actor_id
         self.device_id = device_id
         self.name = name
+        self.fwversion = fwversion
+        self.productname = productname
+        self.manufacturer = manufacturer
 
     def switch_on(self):
         """

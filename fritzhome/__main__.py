@@ -36,6 +36,22 @@ def cli(context, host, username, password):
 
 @cli.command()
 @click.pass_context
+def actors(context):
+    """Display a list of actors"""
+    fritz = context.obj
+    fritz.login()
+
+    for actor in fritz.get_actors():
+        click.echo("{} ({} {}; AIN {})".format(
+            actor.name,
+            actor.manufacturer,
+            actor.productname,
+            actor.actor_id,
+        ))
+
+
+@cli.command()
+@click.pass_context
 def energy(context):
     """Display energy stats of all actors"""
     fritz = context.obj
