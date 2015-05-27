@@ -61,8 +61,8 @@ def energy(context):
         click.echo("{} ({}): {:.2f} Watt current, {:.3f} wH total".format(
             actor.name,
             actor.actor_id,
-            actor.get_power() / 1000,
-            actor.get_energy() / 100
+            (actor.get_power() or 0.0) / 1000,
+            (actor.get_energy() or 0.0) / 100
         ))
 
 
