@@ -35,7 +35,6 @@ setup(
     packages=["fritzhome"],
 
     install_requires=[
-        'beautifulsoup4>=4.3.2',
         'requests>=2.7.0',
         'click>=4.0.0',
     ],
