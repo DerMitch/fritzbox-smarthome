@@ -51,3 +51,9 @@ Switching SmartHome Wohnzimmer on
 ```
 $ fritzhome [--server ip] graphite localhost [--port 2003] [--interval 10] [--prefix smarthome]
 ```
+
+Referenzen
+----------
+
+* [AHA-HTTP-Interface](https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AHA-HTTP-Interface.pdf)
+* [PHP AHA Reader](http://www.tdressler.net/ipsymcon/download/fritz_aha_reader2.phps)
