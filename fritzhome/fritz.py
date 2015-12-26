@@ -16,7 +16,10 @@ from collections import namedtuple
 from xml.etree import ElementTree as ET
 
 from requests import Session
-from bs4 import BeautifulSoup
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
 
 from .actor import Actor
 
@@ -269,6 +272,8 @@ class FritzBox(object):
         """
         Return the system logs since the last reboot.
         """
+        assert BeautifulSoup, "Please install bs4 to use this method"
+
         url = self.base_url + "/system/syslog.lua"
         response = self.session.get(url, params={
             'sid': self.sid,
