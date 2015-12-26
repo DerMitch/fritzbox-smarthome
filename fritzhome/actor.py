@@ -11,15 +11,24 @@ class Actor(object):
     instead.
     """
 
-    def __init__(self, fritzbox, actor_id, device_id, name, fwversion,
-                       productname, manufacturer):
+    def __init__(self, fritzbox, device):
         self.box = fritzbox
-        self.actor_id = actor_id
-        self.device_id = device_id
-        self.name = name
-        self.fwversion = fwversion
-        self.productname = productname
-        self.manufacturer = manufacturer
+
+        self.actor_id = device.attrib['identifier']
+        self.device_id = device.attrib['id']
+        self.name = device.find('name').text
+        self.fwversion = device.attrib['fwversion']
+        self.productname = device.attrib['productname']
+        self.manufacturer = device.attrib['manufacturer']
+        self.functionbitmask = int(device.attrib['functionbitmask'])
+
+        self.has_powermeter = self.functionbitmask & (1 << 7) > 0
+        self.has_temperature = self.functionbitmask & (1 << 8) > 0
+        self.has_switch = self.functionbitmask & (1 << 9) > 0
+
+        self.temperature = 0.0
+        if self.has_temperature:
+            self.temperature = int(device.find("temperature").find("celsius").text) / 10
 
     def switch_on(self):
         """
@@ -63,6 +72,15 @@ class Actor(object):
         Attention: Returns None if the value can't be queried or is unknown.
         """
         value = self.box.homeautoswitch("getswitchenergy", self.actor_id)
+        return int(value) if value.isdigit() else None
+
+    def get_temperature(self):
+        """
+        Returns the current environment temperature.
+        Attention: Returns None if the value can't be queried or is unknown.
+        """
+        raise NotImplementedError("This should work according to the AVM docs, but don't...")
+        value = self.box.homeautoswitch("gettemperature", self.actor_id)
         return int(value) if value.isdigit() else None
 
     def get_consumption(self, timerange="10"):

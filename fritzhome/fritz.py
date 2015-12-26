@@ -92,23 +92,15 @@ class FritzBox(object):
     def get_actors(self):
         """
         Returns a list of Actor objects for querying SmartHome devices.
-        Recommended method as long AVM does not change their interface HTML.
+
+        This is currently the only working method for getting temperature data.
         """
         devices = self.homeautoswitch("getdevicelistinfos")
         xml = ET.fromstring(devices)
 
         actors = []
         for device in xml.findall('device'):
-            name = device.find('name').text
-            actors.append(Actor(
-                fritzbox=self,
-                actor_id=device.attrib['identifier'],
-                device_id=device.attrib['id'],
-                fwversion=device.attrib['fwversion'],
-                productname=device.attrib['productname'],
-                manufacturer=device.attrib['manufacturer'],
-                name=name,
-            ))
+            actors.append(Actor(fritzbox=self, device=device))
 
         return actors
 
@@ -155,6 +147,7 @@ class FritzBox(object):
             'present': Connected to server? (boolean)
             'power': Current power consumption in mW
             'energy': Used energy in Wh since last energy reset
+            'temperature': Current environment temperature in celsius
         }
         """
         actors = {}
@@ -165,6 +158,7 @@ class FritzBox(object):
                 'present': bool(self.homeautoswitch("getswitchpresent", ain)),
                 'power': self.homeautoswitch("getswitchpower", ain),
                 'energy': self.homeautoswitch("getswitchenergy", ain),
+                'temperature': self.homeautoswitch("getswitchtemperature", ain),
             }
         return actors
 

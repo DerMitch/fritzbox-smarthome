@@ -51,19 +51,25 @@ def actors(context):
 
 
 @cli.command()
+@click.option('--features', type=bool, default=False, help="Show device features")
 @click.pass_context
-def energy(context):
+def energy(context, features):
     """Display energy stats of all actors"""
     fritz = context.obj
     fritz.login()
 
     for actor in fritz.get_actors():
-        click.echo("{} ({}): {:.2f} Watt current, {:.3f} wH total".format(
+        click.echo("{} ({}): {:.2f} Watt current, {:.3f} wH total, {:.2f} °C".format(
             actor.name,
             actor.actor_id,
             (actor.get_power() or 0.0) / 1000,
-            (actor.get_energy() or 0.0) / 100
+            (actor.get_energy() or 0.0) / 100,
+            actor.temperature
         ))
+        if features:
+            click.echo("  Features: PowerMeter: {}, Temperatur: {}, Switch: {}".format(
+                actor.has_powermeter, actor.has_temperature, actor.has_switch
+            ))
 
 
 @cli.command()
