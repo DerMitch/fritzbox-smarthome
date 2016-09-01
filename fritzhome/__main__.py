@@ -165,6 +165,37 @@ def switch_off(context, ain):
         click.echo("Actor not found: {}".format(ain))
 
 
+@cli.command(name="switch-state")
+@click.argument('ain')
+@click.pass_context
+def switch_on(context, ain):
+    """Get an actor's power state"""
+    context.obj.login()
+    actor = context.obj.get_actor_by_ain(ain)
+    if actor:
+        click.echo("State for {} is: {}".format(ain,'ON' if actor.get_state() else 'OFF'))
+    else:
+        click.echo("Actor not found: {}".format(ain))
+
+
+@cli.command(name="switch-toggle")
+@click.argument('ain')
+@click.pass_context
+def switch_on(context, ain):
+    """Toggle an actor's power state"""
+    context.obj.login()
+    actor = context.obj.get_actor_by_ain(ain)
+    if actor:
+        if actor.get_state():
+            actor.switch_off()
+            click.echo("State for {} is now OFF".format(ain))
+        else:
+            actor.switch_on()
+            click.echo("State for {} is now ON".format(ain))
+    else:
+        click.echo("Actor not found: {}".format(ain))
+
+
 @cli.command()
 @click.option('--format', type=click.Choice(['plain', 'json']),
               default='plain')
