@@ -47,7 +47,9 @@ class Actor(object):
         Get the current switch state.
         """
         return bool(
-            self.box.homeautoswitch("getswitchstate", self.actor_id)
+            int(
+                self.box.homeautoswitch("getswitchstate", self.actor_id)
+            )
         )
 
     def get_present(self):
