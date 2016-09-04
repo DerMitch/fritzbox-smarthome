@@ -168,7 +168,7 @@ def switch_off(context, ain):
 @cli.command(name="switch-state")
 @click.argument('ain')
 @click.pass_context
-def switch_on(context, ain):
+def switch_state(context, ain):
     """Get an actor's power state"""
     context.obj.login()
     actor = context.obj.get_actor_by_ain(ain)
@@ -181,7 +181,7 @@ def switch_on(context, ain):
 @cli.command(name="switch-toggle")
 @click.argument('ain')
 @click.pass_context
-def switch_on(context, ain):
+def switch_toggle(context, ain):
     """Toggle an actor's power state"""
     context.obj.login()
     actor = context.obj.get_actor_by_ain(ain)
