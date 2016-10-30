@@ -81,9 +81,12 @@ class Actor(object):
         Returns the current environment temperature.
         Attention: Returns None if the value can't be queried or is unknown.
         """
-        raise NotImplementedError("This should work according to the AVM docs, but don't...")
+        #raise NotImplementedError("This should work according to the AVM docs, but don't...")
         value = self.box.homeautoswitch("gettemperature", self.actor_id)
-        return int(value) if value.isdigit() else None
+        if value.isdigit():
+            return float(value)/10
+        else:
+            return None
 
     def get_consumption(self, timerange="10"):
         """
