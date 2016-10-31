@@ -28,7 +28,11 @@ class Actor(object):
 
         self.temperature = 0.0
         if self.has_temperature:
-            self.temperature = int(device.find("temperature").find("celsius").text) / 10
+            if device.find("temperature").find("celsius").text is not None:
+                self.temperature = int(device.find("temperature").find("celsius").text) / 10
+            else:
+                warn("Actor " + self.name + " seems offline")
+                self.temperature=None
 
     def switch_on(self):
         """
