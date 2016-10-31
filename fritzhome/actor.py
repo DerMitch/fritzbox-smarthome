@@ -2,7 +2,8 @@
     AVM SmartHome Actor
     ~~~~~~~~~~~~~~~~~~~
 """
-
+import logging
+logger = logging.getLogger(__name__)
 
 class Actor(object):
     """
@@ -31,7 +32,7 @@ class Actor(object):
             if device.find("temperature").find("celsius").text is not None:
                 self.temperature = int(device.find("temperature").find("celsius").text) / 10
             else:
-                warn("Actor " + self.name + " seems offline")
+                logger.warn("Actor " + self.name + " seems offline. Returning None as temperature.")
                 self.temperature=None
 
     def switch_on(self):
