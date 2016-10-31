@@ -53,10 +53,11 @@ class FritzBoxTemeraturePlotter(object):
         logger.info("Closing plot")
 
 class FritzBoxLogger(fritz.FritzBox,Thread):
-    def __init__(self, ip, username, password, use_tls=False):
+    def __init__(self, ip, username, password, use_tls=False, delayInMinutes=10):
         super().__init__(ip, username, password, use_tls)
         Thread.__init__(self)
         self.goon=True
+        self.delayInSeconds=int(delayInMinutes*60)
 
             
     def startLogging(self, repeats=2,delay=1):    
@@ -82,7 +83,7 @@ class FritzBoxLogger(fritz.FritzBox,Thread):
         self.goon=False
         
     def run(self):
-        self.startLogging(-1,2)
+        self.startLogging(-1, self.delayInSeconds)
         
 def signal_handler(signal, frame):
     logger.warn('You pressed Ctrl+C, stopping FritzLogger')
