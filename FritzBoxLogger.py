@@ -18,8 +18,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
-
 class FritzBoxTemeraturePlotter(object):
     def parseFile(self, filename):
         logger.debug("Parsing file" + filename)
@@ -30,8 +28,11 @@ class FritzBoxTemeraturePlotter(object):
             mylist = f.read().splitlines()
         for line in mylist:
             line=line.split(";")
-            timestamp.append(datetime.datetime.strptime(line[0],"%Y-%m-%d %H:%M:%S"))
-            temperature.append(float(line[1]))
+            try:
+                temperature.append(float(line[1]))
+                timestamp.append(datetime.datetime.strptime(line[0],"%Y-%m-%d %H:%M:%S"))
+            except ValueError:
+                logger.debug(line[1]+ " seems not to be a valid temperature, skipping line")               
         return [timestamp,temperature]
 
     def __init__(self,plotnow=0):
@@ -56,6 +57,7 @@ class FritzBoxLogger(fritz.FritzBox,Thread):
         super().__init__(ip, username, password, use_tls)
         Thread.__init__(self)
         self.goon=True
+
             
     def startLogging(self, repeats=2,delay=1):    
         i=0
@@ -80,12 +82,11 @@ class FritzBoxLogger(fritz.FritzBox,Thread):
         self.goon=False
         
     def run(self):
-        self.startLogging(-1,3)
+        self.startLogging(-1,2)
         
 def signal_handler(signal, frame):
     logger.warn('You pressed Ctrl+C, stopping FritzLogger')
-    f.stopit()
-    
+    f.stopit()    
 signal.signal(signal.SIGINT, signal_handler)
 
 f=FritzBoxLogger("fritz.box", "smarthome","smarthome")
