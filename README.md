@@ -1,22 +1,32 @@
 fritzbox-smarthome
 ==================
 
+**(DE) Bitte beachten**: Diese Bibliothek wird nicht aktiv vom Autor weiterentwickelt, Pull Requests werden jedoch geprüft und eingepflegt.
+
+**(EN) Please note:** This library is not in active development by the author, yet pull requests are reviewed and merged.
+
 Python-Bibliothek um FRITZ!Box SmartHome-Geräte (DECT 200, PowerLine 546E, ...) zu steuern und die Energiewerte auszulesen.
 
 Getestet mit:
 
-* FRITZ!Box 7390 (Firmware 06.23)
+* FRITZ!Box 7390 (Firmware 06.23, 06.50+)
 * FRITZ!DECT 200
 * FRITZ!Powerline 546E
 
 Installation
 ------------
 
+Es ist empfehlenswert, ein eigenes virtualenv zur Verwendung anzulegen. Unser macOS kann dieses Tool vorher mit `brew install virtualenv` installiert werden, unter Linux-Systemen hängt dies von der Distribution ab. Windows wird nicht offiziell unterstützt.
+
 ```
 virtualenv ~/fritzenv
-source ~/fritzenv/bin/activate
-pip install fritzhome
+. ~/fritzenv/bin/activate
+git clone https://github.com/DerMitch/fritzbox-smarthome.git
+cd fritzbox-smarthome
+pip install .
 ```
+
+**Hinweis:** Das PyPi-Paket `fritzhome` wird nur selten aktualisiert, daher ist die Verwendung des git-Masters zu bevorzugen.
 
 SmartHome-Benutzer
 ------------------
@@ -30,9 +40,9 @@ Aus Sicherheisgründen ist es empfehlenswert, einen eigenen Benutzer zum SmartHo
 Verwendung
 ----------
 
-Beispiele zur Verwendung der API befindet sich in der Datei __main__.py.
+Beispiele zur Verwendung der API befindet sich in der Datei `__main__.py`.
 
-Nach der Installation steht das fritzhome Tool zur Verfügung, mit dem die Energiedaten auf der CLI angezeigt und nach Graphite exportiert werden können.
+Nach der Installation steht das `fritzhome` Tool zur Verfügung, mit dem die Energiedaten auf der CLI angezeigt und nach Graphite exportiert werden können.
 
 Befehle:
 
@@ -50,6 +60,15 @@ Switching SmartHome Wohnzimmer on
 
 ```
 $ fritzhome [--server ip] graphite localhost [--port 2003] [--interval 10] [--prefix smarthome]
+```
+
+Aufruf außerhalb des virtualenv
+-------------------------------
+
+Das `fritzhome` kann mit Hilfe seines absoluten Pfades innerhalb des virtualenv ausgeführt werden:
+
+```
+~/fritzenv/bin/fritzhome --help
 ```
 
 Referenzen
