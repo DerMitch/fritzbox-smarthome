@@ -11,6 +11,7 @@
 
 from __future__ import print_function, division
 
+import logging
 import hashlib
 from collections import namedtuple
 from xml.etree import ElementTree as ET
@@ -24,7 +25,8 @@ except ImportError:
 from .actor import Actor
 
 
-Device = namedtuple("Device", "deviceid connectstate switchstate")
+logger = logging.getLogger(__name__)
+#Device = namedtuple("Device", "deviceid connectstate switchstate")
 LogEntry = namedtuple("LogEntry", "date time message hash")
 
 
@@ -66,7 +68,7 @@ class FritzBox(object):
             url = self.base_url + "/login_sid.lua"
             response = self.session.get(url, params={
                 "username": self.username,
-                "response": self.calculate_response(challenge, self.password),
+                "response": self._calculate_response(challenge, self.password),
             })
             xml = ET.fromstring(response.text)
             sid = xml.find('SID').text
@@ -80,42 +82,13 @@ class FritzBox(object):
             self.sid = sid
             return sid
 
-    def calculate_response(self, challenge, password):
+    def _calculate_response(self, challenge, password):
         """Calculate response for the challenge-response authentication"""
         to_hash = (challenge + "-" + password).encode("UTF-16LE")
         hashed = hashlib.md5(to_hash).hexdigest()
         return "{0}-{1}".format(challenge, hashed)
 
-    #
-    # Useful public methods
-    #
-    def get_actors(self):
-        """
-        Returns a list of Actor objects for querying SmartHome devices.
-
-        This is currently the only working method for getting temperature data.
-        """
-        devices = self.homeautoswitch("getdevicelistinfos")
-        xml = ET.fromstring(devices)
-
-        actors = []
-        for device in xml.findall('device'):
-            actors.append(Actor(fritzbox=self, device=device))
-
-        return actors
-
-    def get_actor_by_ain(self, ain):
-        """
-        Return a actor identified by it's ain or return None
-        """
-        for actor in self.get_actors():
-            if actor.actor_id == ain:
-                return actor
-
-    #
-    # "Private" methods
-    #
-    def homeautoswitch(self, cmd, ain=None):
+    def _homeautoswitch(self, cmd, ain=None):
         """
         Call a switch method.
         Should only be used by internal library functions.
@@ -130,82 +103,94 @@ class FritzBox(object):
         url = self.base_url + '/webservices/homeautoswitch.lua'
         response = self.session.get(url, params=params)
         response.raise_for_status()
-        return response.text.strip()
+        return response.content.strip()
+
+    # Methods for commands as defined in
+    # http://www.avm.de/de/Extern/files/session_id/AHA-HTTP-Interface.pdf
+    def get_switch_list(self):
+        val = self._homeautoswitch('getswitchlist')
+        if val:
+            return val.split(',')
+        return []
 
     def get_switch_actors(self):
+        """ Get information all switch actors """
+        return filter(lambda a: a.actor_id, self.get_actors())
+
+    def set_switch_on(self, actor):
+        """Switch the power of a actor ON"""
+        return self._homeautoswitch('setswitchon', actor.actor_id)
+
+    def set_switch_off(self, actor):
+        """Switch the power of a actor OFF"""
+        return self._homeautoswitch('setswitchoff', actor.actor_id)
+
+    def set_switch_toggle(self, actor):
+        """Toggle a power switch and return the new state"""
+        return self._homeautoswitch('setswitchtoggle', actor.actor_id)
+
+    def get_switch_state(self, actor):
+        """ Get the current switch state. """
+        val = self._homeautoswitch('getswitchstate', actor.actor_id)
+        return int(val) if val.isdigit() else None
+
+    def get_switch_present(self, actor):
+        """ Check if the registered actor is currently present (reachable).
         """
-        Get information about all actors
+        val = self._homeautoswitch('getswitchpresent', actor.actor_id)
+        return int(val) if val.isdigit() else None
 
-        This needs 1+(5n) requests where n = number of actors registered
-
-        Deprecated, use get_actors instead.
-
-        Returns a dict:
-        [ain] = {
-            'name': Name of actor,
-            'state': Powerstate (boolean)
-            'present': Connected to server? (boolean)
-            'power': Current power consumption in mW
-            'energy': Used energy in Wh since last energy reset
-            'temperature': Current environment temperature in celsius
-        }
+    def get_switch_power(self, actor):
+        """ Returns the current power usage in milliWatts.
+        Attention: Returns None if the value can't be queried or is unknown.
         """
-        actors = {}
-        for ain in self.homeautoswitch("getswitchlist").split(','):
-            actors[ain] = {
-                'name': self.homeautoswitch("getswitchname", ain),
-                'state': bool(self.homeautoswitch("getswitchstate", ain)),
-                'present': bool(self.homeautoswitch("getswitchpresent", ain)),
-                'power': self.homeautoswitch("getswitchpower", ain),
-                'energy': self.homeautoswitch("getswitchenergy", ain),
-                'temperature': self.homeautoswitch("getswitchtemperature", ain),
-            }
+        val = self._homeautoswitch('getswitchpower', actor.actor_id)
+        return int(val) if val.isdigit() else None
+
+    def get_switch_energy(self, actor):
+        """ Returns the consumed energy since the start of the statistics in Wh.
+        Attention: Returns None if the value can't be queried or is unknown.
+        """
+        val = self._homeautoswitch('getswitchenergy', actor.actor_id)
+        return int(val) if val.isdigit() else None
+
+    def get_switch_name(self, actor):
+        return self._homeautoswitch('getswitchname', actor.actor_id)
+
+    def get_device_list_infos(self):
+        """ Returns a list of Actor objects for querying SmartHome devices.
+        This is currently the only working method for getting temperature data.
+        """
+        devices = self._homeautoswitch('getdevicelistinfos')
+        xml = ET.fromstring(devices)
+
+        actors = []
+        for device in xml.findall('device'):
+            actors.append(Actor(device_xml=device))
+
         return actors
 
-    def set_switch_on(self, ain):
-        """Switch the power of a actor ON"""
-        return self.homeautoswitch('setswitchon', ain)
-
-    def set_switch_off(self, ain):
-        """Switch the power of a actor OFF"""
-        return self.homeautoswitch('setswitchoff', ain)
-
-    def set_switch_toggle(self, ain):
-        """Toggle a power switch and return the new state"""
-        return self.homeautoswitch('setswitchtoggle', ain)
-
-    #
-    # DeviceID based methods
-    #
-    # Inspired by:
-    # https://github.com/valpo/fritzbox/blob/master/fritzbox/fritzautohome.py
-    #
-
-    def get_devices(self):
+    def get_temperature(self):
+        """ Returns the current environment temperature.
+        Attention: Returns None if the value can't be queried or is unknown.
         """
-        Return a list of devices.
-        Deprecated, use get_actors instead.
-        """
-        url = self.base_url + '/net/home_auto_query.lua'
-        response = self.session.get(url, params={
-            'sid': self.sid,
-            'command': 'AllOutletStates',
-            'xhr': 0,
-        })
-        response.raise_for_status()
-        data = response.json()
-        count = int(data["Outlet_count"])
-        devices = []
-        for i in range(1, count + 1):
-            device = Device(
-                int(data["DeviceID_{0}".format(i)]),
-                int(data["DeviceConnectState_{0}".format(i)]),
-                int(data["DeviceSwitchState_{0}".format(i)])
-            )
-            devices.append(device)
-        return devices
+        val = self._homeautoswitch('gettemperature', actor.actor_id)
+        return float(val)/10 if val.isdigit() else None
 
-    def get_consumption(self, deviceid, timerange="10"):
+
+    # Helpers / "own" methods
+    def get_actor_by_ain(self, ain):
+        """
+        Return a actor identified by it's ain or return None
+        """
+        for actor in self.get_actors():
+            if actor.actor_id == ain:
+                return actor
+
+    def get_actors(self):
+        return self.get_device_list_infos()
+
+    def get_consumption(self, actor, timerange='10'):
         """
         Return all available energy consumption data for the device.
         You need to divice watt_values by 100 and volt_values by 1000
@@ -223,7 +208,7 @@ class FritzBox(object):
         response = self.session.get(url, params={
             'sid': self.sid,
             'command': 'EnergyStats_{0}'.format(timerange),
-            'id': deviceid,
+            'id': actor.device_id,
             'xhr': 0,
         })
         response.raise_for_status()
