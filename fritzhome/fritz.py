@@ -49,7 +49,7 @@ class FritzBox(object):
         self.username = username
         self.password = password
         self.sid = None
-
+        self._loginloop = False
         self.session = Session()
 
     def login(self):
@@ -80,7 +80,17 @@ class FritzBox(object):
                 exc.blocktime = blocktime
                 raise exc
             self.sid = sid
+            self._loginloop = False
             return sid
+
+    def _get(self, url, params):
+        response = self.session.get(url, params=params)
+        if response.status_code == 403 and not self._loginloop:
+            self._loginloop = True
+            self.login()
+            return self._get(url, params)
+        response.raise_for_status()
+        return response
 
     def _calculate_response(self, challenge, password):
         """Calculate response for the challenge-response authentication"""
@@ -101,7 +111,7 @@ class FritzBox(object):
         if ain:
             params['ain'] = ain
         url = self.base_url + '/webservices/homeautoswitch.lua'
-        response = self.session.get(url, params=params)
+        response = self._get(url, params=params)
         response.raise_for_status()
         return response.content.strip()
 
@@ -205,7 +215,7 @@ class FritzBox(object):
             )
 
         url = self.base_url + "/net/home_auto_query.lua"
-        response = self.session.get(url, params={
+        response = self._get(url, params={
             'sid': self.sid,
             'command': 'EnergyStats_{0}'.format(timerange),
             'id': actor.device_id,
@@ -254,7 +264,7 @@ class FritzBox(object):
         assert BeautifulSoup, "Please install bs4 to use this method"
 
         url = self.base_url + "/system/syslog.lua"
-        response = self.session.get(url, params={
+        response = self._get(url, params={
             'sid': self.sid,
             'stylemode': 'print',
         })
