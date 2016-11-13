@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     AVM Fritz!BOX SmartHome Client
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,7 +24,7 @@ except ImportError:
     BeautifulSoup = None
 
 from .actor import Actor
-
+from .utils import c_from_hkr_temperature, c_to_hkr_temperature
 
 logger = logging.getLogger(__name__)
 #Device = namedtuple("Device", "deviceid connectstate switchstate")
@@ -98,7 +99,7 @@ class FritzBox(object):
         hashed = hashlib.md5(to_hash).hexdigest()
         return "{0}-{1}".format(challenge, hashed)
 
-    def _homeautoswitch(self, cmd, ain=None):
+    def _homeautoswitch(self, cmd, ain=None, param=None):
         """
         Call a switch method.
         Should only be used by internal library functions.
@@ -108,8 +109,11 @@ class FritzBox(object):
             'switchcmd': cmd,
             'sid': self.sid,
         }
-        if ain:
+        if ain is not None:
             params['ain'] = ain
+        if param is not None:
+            params['param'] = param
+
         url = self.base_url + '/webservices/homeautoswitch.lua'
         response = self._get(url, params=params)
         response.raise_for_status()
@@ -180,13 +184,32 @@ class FritzBox(object):
 
         return actors
 
-    def get_temperature(self):
+    def get_temperature(self, actor):
         """ Returns the current environment temperature.
         Attention: Returns None if the value can't be queried or is unknown.
         """
         val = self._homeautoswitch('gettemperature', actor.actor_id)
         return float(val)/10 if val.isdigit() else None
 
+    def get_hkr_tsoll(self, actor):
+        val = self._homeautoswitch('gethkrtsoll', actor.actor_id)
+        c_val = c_from_hkr_temperature(val)
+        return c_val
+
+    def get_hkr_komfort(self, actor):
+        val = self._homeautoswitch('gethkrkomfort', actor.actor_id)
+        c_val = c_from_hkr_temperature(val)
+        return c_val
+
+    def get_hkr_absenk(self, actor):
+        val = self._homeautoswitch('gethkrabsenk', actor.actor_id)
+        c_val = c_from_hkr_temperature(val)
+        return c_val
+
+    def set_hkr_soll(self, actor, temperature):
+        new_hkr_temp = c_to_hkr_temperature(temperature)
+        val = self._homeautoswitch('sethkrtsoll', actor.actor_id, new_hkr_temp)
+        return val
 
     # Helpers / "own" methods
     def get_actor_by_ain(self, ain):
