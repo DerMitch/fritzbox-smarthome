@@ -127,10 +127,6 @@ class FritzBox(object):
             return val.split(',')
         return []
 
-    def get_switch_actors(self):
-        """ Get information all switch actors """
-        return filter(lambda a: a.actor_id, self.get_actors())
-
     def set_switch_on(self, actor):
         """Switch the power of a actor ON"""
         return self._homeautoswitch('setswitchon', actor.actor_id)
@@ -206,12 +202,20 @@ class FritzBox(object):
         c_val = c_from_hkr_temperature(val)
         return c_val
 
-    def set_hkr_soll(self, actor, temperature):
+    def set_hkr_tsoll(self, actor, temperature):
         new_hkr_temp = c_to_hkr_temperature(temperature)
         val = self._homeautoswitch('sethkrtsoll', actor.actor_id, new_hkr_temp)
         return val
 
     # Helpers / "own" methods
+    def get_switch_actors(self):
+        """ Get all switch actors """
+        return filter(lambda a: a.has_switch, self.get_actors())
+
+    def get_hkr_actors(self):
+        ''' Get all HKR actors'''
+        return filter(lambda a: a.has_hkr, self.get_actors())
+
     def get_actor_by_ain(self, ain):
         """
         Return a actor identified by it's ain or return None
