@@ -59,7 +59,7 @@ class FritzBox(object):
           other users.
         - SIDs expire after some time
         """
-        response = self.session.get(self.base_url + '/login_sid.lua')
+        response = self.session.get(self.base_url + '/login_sid.lua', timeout=10)
         xml = ET.fromstring(response.text)
         if xml.find('SID').text == "0000000000000000":
             challenge = xml.find('Challenge').text
@@ -67,7 +67,7 @@ class FritzBox(object):
             response = self.session.get(url, params={
                 "username": self.username,
                 "response": self.calculate_response(challenge, self.password),
-            })
+            }, timeout=10)
             xml = ET.fromstring(response.text)
             sid = xml.find('SID').text
             if xml.find('SID').text == "0000000000000000":
@@ -128,7 +128,7 @@ class FritzBox(object):
         if ain:
             params['ain'] = ain
         url = self.base_url + '/webservices/homeautoswitch.lua'
-        response = self.session.get(url, params=params)
+        response = self.session.get(url, params=params, timeout=10)
         response.raise_for_status()
         return response.text.strip()
 
@@ -191,7 +191,7 @@ class FritzBox(object):
             'sid': self.sid,
             'command': 'AllOutletStates',
             'xhr': 0,
-        })
+        }, timeout=15)
         response.raise_for_status()
         data = response.json()
         count = int(data["Outlet_count"])
@@ -225,7 +225,7 @@ class FritzBox(object):
             'command': 'EnergyStats_{0}'.format(timerange),
             'id': deviceid,
             'xhr': 0,
-        })
+        }, timeout=15)
         response.raise_for_status()
 
         data = response.json()
@@ -272,7 +272,7 @@ class FritzBox(object):
         response = self.session.get(url, params={
             'sid': self.sid,
             'stylemode': 'print',
-        })
+        }, timeout=15)
         response.raise_for_status()
 
         entries = []
