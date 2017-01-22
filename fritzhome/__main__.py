@@ -18,7 +18,7 @@ from .fritz import FritzBox
 
 
 @click.group()
-@click.option('--host', default='fritz.box')
+@click.option('--host', default='169.254.1.1') # fritzbox "emergency" IP
 @click.option('--username', default='smarthome')
 @click.option('--password', default='smarthome')
 @click.pass_context
