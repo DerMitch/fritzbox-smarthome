@@ -115,7 +115,7 @@ class FritzBox(object):
     #
     # "Private" methods
     #
-    def homeautoswitch(self, cmd, ain=None):
+    def homeautoswitch(self, cmd, ain=None,paramOfCmd=''):
         """
         Call a switch method.
         Should only be used by internal library functions.
@@ -124,6 +124,7 @@ class FritzBox(object):
         params = {
             'switchcmd': cmd,
             'sid': self.sid,
+            'param' : paramOfCmd,
         }
         if ain:
             params['ain'] = ain
