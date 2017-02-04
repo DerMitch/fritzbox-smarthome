@@ -93,7 +93,21 @@ class Actor(object):
             return float(value)/10
         else:
             return None
-
+    def set_temperature(self,temp):
+        """
+        Sets the temperature in celcius
+        """
+        param= 16 + ( ( temp - 8 ) * 2 ) # Temperature is send to fritz.box a little weired.
+        if param < 16:
+            param=253
+            logger.info("Actor " + self.name + ": Temperature control set to off")
+        elif param >=56:
+            param=254
+            logger.info("Actor " + self.name + ": Temperature control set to on")
+        else:
+            logger.info("Actor " + self.name + ": Temperature control set to " + str(temp))
+        value = self.box.homeautoswitch("sethkrtsoll", self.actor_id, param)
+        
     def get_consumption(self, timerange="10"):
         """
         Return the energy report for the device.
