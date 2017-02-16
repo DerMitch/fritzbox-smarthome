@@ -53,9 +53,7 @@ class Actor(object):
         Get the current switch state.
         """
         return bool(
-            int(
-                self.box.homeautoswitch("getswitchstate", self.actor_id)
-            )
+            int(self.box.homeautoswitch("getswitchstate", self.actor_id))
         )
 
     def get_present(self):
@@ -63,7 +61,7 @@ class Actor(object):
         Check if the registered actor is currently present (reachable).
         """
         return bool(
-            self.box.homeautoswitch("getswitchpresent", self.actor_id)
+            int(self.box.homeautoswitch("getswitchpresent", self.actor_id))
         )
 
     def get_power(self):

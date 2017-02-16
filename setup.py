@@ -14,7 +14,7 @@ except FileNotFoundError:
 
 setup(
     name="fritzhome",
-    version="1.0.2",
+    version="1.0.3",
 
     description="Query information from your FRITZ!Box (mostly energy)",
     long_description=long_description,
