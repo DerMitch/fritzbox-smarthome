@@ -11,3 +11,4 @@ testup:
 
 up:
 	twine upload dist/*
+	mv dist/* dist/old/
