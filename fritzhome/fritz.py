@@ -89,6 +89,7 @@ class FritzBox(object):
     #
     # Useful public methods
     #
+
     def get_actors(self):
         """
         Returns a list of Actor objects for querying SmartHome devices.
@@ -115,7 +116,8 @@ class FritzBox(object):
     #
     # "Private" methods
     #
-    def homeautoswitch(self, cmd, ain=None,paramOfCmd=''):
+
+    def homeautoswitch(self, cmd, ain=None, param=None):
         """
         Call a switch method.
         Should only be used by internal library functions.
@@ -124,10 +126,12 @@ class FritzBox(object):
         params = {
             'switchcmd': cmd,
             'sid': self.sid,
-            'param' : paramOfCmd,
         }
+        if param is not None:
+            params['param'] = param
         if ain:
             params['ain'] = ain
+
         url = self.base_url + '/webservices/homeautoswitch.lua'
         response = self.session.get(url, params=params, timeout=10)
         response.raise_for_status()
