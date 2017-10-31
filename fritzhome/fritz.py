@@ -135,7 +135,7 @@ class FritzBox(object):
         url = self.base_url + '/webservices/homeautoswitch.lua'
         response = self.session.get(url, params=params, timeout=10)
         response.raise_for_status()
-        return response.text.strip()
+        return response.text.strip().encode('utf-8')
 
     def get_switch_actors(self):
         """

@@ -61,7 +61,7 @@ def energy(context, features):
 
     for actor in fritz.get_actors():
         click.echo("{} ({}): {:.2f} Watt current, {:.3f} wH total, {:.2f} °C".format(
-            actor.name,
+            actor.name.encode('utf-8'),
             actor.actor_id,
             (actor.get_power() or 0.0) / 1000,
             (actor.get_energy() or 0.0) / 100,
