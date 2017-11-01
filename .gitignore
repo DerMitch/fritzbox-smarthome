@@ -55,3 +55,6 @@ docs/_build/
 logs
 LOG_*.txt
 .env
+
+# PyCharm files
+.idea/
