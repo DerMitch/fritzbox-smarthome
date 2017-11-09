@@ -28,6 +28,7 @@ class Actor(object):
         self.has_powermeter = self.functionbitmask & (1 << 7) > 0
         self.has_temperature = self.functionbitmask & (1 << 8) > 0
         self.has_switch = self.functionbitmask & (1 << 9) > 0
+        self.has_heating_controller = self.functionbitmask & (1 << 6) > 0
 
         self.temperature = 0.0
         if self.has_temperature:
@@ -36,6 +37,20 @@ class Actor(object):
             else:
                 logger.warn("Actor " + self.name + " seems offline. Returning None as temperature.")
                 self.temperature=None
+
+        self.target_temperature = 0.0
+        self.target_temperature = 0.0
+        self.battery_low = True
+        if self.has_heating_controller:
+            hkr = device.find("hkr")
+            if hkr is not None:
+                for child in hkr:
+                    if child.tag == 'tist':
+                        self.temperature = self.__get_temp(child.text)
+                    elif child.tag == 'tsoll':
+                        self.target_temperature = self.__get_temp(child.text)
+                    elif child.tag == 'batterylow':
+                        self.battery_low = (child.text == '1')
 
     def switch_on(self):
         """
@@ -89,11 +104,34 @@ class Actor(object):
         #raise NotImplementedError("This should work according to the AVM docs, but don't...")
         value = self.box.homeautoswitch("gettemperature", self.actor_id)
         if value.isdigit():
-            return float(value)/10
+            self.temperature = float(value)/10
+        else:
+            self.temperature = None
+        return self.temperature
+
+    def __get_temp(self, value):
+        # Temperature is send from fritz.box a little weird
+        if value.isdigit():
+            value = float(value)
+            if value == 253:
+                return 0
+            elif value == 254:
+                return 30
+            else:
+                return value / 2
         else:
             return None
 
-    def set_temperature(self,temp):
+    def get_target_temperature(self):
+        """
+        Returns the actual target temperature.
+        Attention: Returns None if the value can't be queried or is unknown.
+        """
+        value = self.box.homeautoswitch("gethkrtsoll", self.actor_id)
+        self.target_temperature = self.__get_temp(value)
+        return self.target_temperature
+
+    def set_temperature(self, temp):
         """
         Sets the temperature in celcius
         """
