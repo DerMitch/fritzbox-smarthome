@@ -14,7 +14,7 @@ except FileNotFoundError:
 
 setup(
     name="fritzhome",
-    version="1.0.4",
+    version="1.0.5",
 
     description="Query information from your FRITZ!Box (mostly energy)",
     long_description=long_description,
@@ -27,7 +27,7 @@ setup(
     license="MIT",
 
     classifiers=[
-        'Development Status :: 5 - Stable',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
