@@ -35,8 +35,8 @@ class Actor(object):
             if device.find("temperature").find("celsius").text is not None:
                 self.temperature = int(device.find("temperature").find("celsius").text) / 10
             else:
-                logger.warn("Actor " + self.name + " seems offline. Returning None as temperature.")
-                self.temperature=None
+                logger.info("Actor " + self.name + " seems offline. Returning None as temperature.")
+                self.temperature = None
 
         self.target_temperature = 0.0
         self.target_temperature = 0.0
