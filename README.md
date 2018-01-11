@@ -16,7 +16,7 @@ Getestet mit:
 Installation
 ------------
 
-Es ist empfehlenswert, ein eigenes virtualenv zur Verwendung anzulegen. Unser macOS kann dieses Tool vorher mit `brew install virtualenv` installiert werden, unter Linux-Systemen hängt dies von der Distribution ab. Windows wird nicht offiziell unterstützt.
+Es ist empfehlenswert, ein eigenes virtualenv zur Verwendung anzulegen. Unter macOS kann dieses Tool vorher mit `brew install virtualenv` installiert werden, unter Linux-Systemen hängt dies von der Distribution ab. Windows wird nicht offiziell unterstützt.
 
 ```
 virtualenv ~/fritzenv
