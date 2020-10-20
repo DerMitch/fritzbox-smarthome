@@ -267,6 +267,31 @@ class FritzBox(object):
 
         return result
 
+    def reset_consumption(self, deviceid):
+        """
+        Resets the energy data stored on fritzbox for reports.
+
+        Atention: User needs permissions for "Alle Einstellungen der FRITZ!Box sehen und bearbeiten"
+
+        :return: bool
+        """
+
+        url = self.base_url + "/net/home_auto_query.lua"
+        response = self.session.post(url, data={
+            'sid': self.sid,
+            'command': 'ResetEnergyData',
+            'id': deviceid,
+            'xhr': 0,
+        }, headers={
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }, timeout=15)
+        response.raise_for_status()
+
+        if response.text == "":
+            raise Exception("consumption reset failed, missing user permission to change settings ?")
+
+        return response.json()["RequestResult"] == True
+
     def get_logs(self):
         """
         Return the system logs since the last reboot.
