@@ -148,12 +148,18 @@ class Actor(object):
             logger.info("Actor " + self.name + ": Temperature control set to " + str(temp))
 
         return self.box.homeautoswitch("sethkrtsoll", self.actor_id, param)
-        
+
     def get_consumption(self, timerange="10"):
         """
         Return the energy report for the device.
         """
         return self.box.get_consumption(self.device_id, timerange)
+
+    def reset_consumption(self):
+        """
+        Resets the energy data stored on fritzbox for reports.
+        """
+        return self.box.reset_consumption(self.device_id)
 
     def __repr__(self):
         return u"<Actor {}>".format(self.name)
