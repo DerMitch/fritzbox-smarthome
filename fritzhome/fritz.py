@@ -11,6 +11,7 @@
 
 from __future__ import print_function, division
 
+import re
 import hashlib
 from collections import namedtuple
 from xml.etree import ElementTree as ET
@@ -130,7 +131,7 @@ class FritzBox(object):
         if param is not None:
             params['param'] = param
         if ain:
-            params['ain'] = ain
+            params['ain'] = sanitize_ain(ain)
 
         url = self.base_url + '/webservices/homeautoswitch.lua'
         response = self.session.get(url, params=params, timeout=10)
@@ -318,3 +319,10 @@ class FritzBox(object):
             msg_hash = hashlib.md5(merged).hexdigest()
             entries.append(LogEntry(date, time, message, msg_hash))
         return entries
+
+
+def sanitize_ain(ain):
+    """
+    Remove invalid characters from an AIN.
+    """
+    return re.sub('[^0-9]', '', ain)
