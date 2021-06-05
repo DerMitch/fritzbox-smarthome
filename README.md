@@ -1,9 +1,9 @@
 fritzbox-smarthome
 ==================
 
-**(DE) Bitte beachten**: Diese Bibliothek wird nicht aktiv vom Autor weiterentwickelt, Pull Requests werden jedoch geprüft und eingepflegt.
+**(DE) Bitte beachten**: Diese Bibliothek wird nicht mehr weiterentwickelt.
 
-**(EN) Please note:** This library is not in active development by the author, yet pull requests are reviewed and merged.
+**(EN) Please note:** This library is no longer being developed.
 
 Python-Bibliothek um FRITZ!Box SmartHome-Geräte (DECT 200, PowerLine 546E, ...) zu steuern und die Energiewerte auszulesen.
 
